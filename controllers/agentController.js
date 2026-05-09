@@ -8,6 +8,10 @@ import axios from "axios";
 //import os from "os";
 import ExcelJS from "exceljs";
 import nodemailer from "nodemailer";
+import dns from "dns";
+
+// Force Node.js to use IPv4 instead of IPv6 to fix Render's ENETUNREACH error
+dns.setDefaultResultOrder("ipv4first");
 
 // 1. Define the Internet Search Tool (Uses Tavily for reliable searching)
 async function performInternetSearch(query) {
