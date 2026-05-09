@@ -4,8 +4,8 @@ import { DynamicTool } from "@langchain/core/tools";
 import axios from "axios";
 //import { TavilySearch } from "@langchain/tavily";
 //import fs from "fs";
-import path from "path";
-import os from "os";
+//import path from "path";
+//import os from "os";
 import ExcelJS from "exceljs";
 import nodemailer from "nodemailer";
 
@@ -95,7 +95,7 @@ const generateExcelTool = new DynamicTool({
             }
 
             const fileName = `Research_Report_${Date.now()}.xlsx`;
-            const filePath = path.join(os.tmpdir(), fileName);
+            const filePath = `./${fileName}`; // Relative path
             await workbook.xlsx.writeFile(filePath);
             
             return filePath;
@@ -127,8 +127,8 @@ const sendEmailTool = new DynamicTool({
 
             let transporter = nodemailer.createTransport({
                 host: 'smtp.gmail.com',
-                port: 587,
-                secure: false, // true for 465, false for other ports like 587
+                port: 465,
+                secure: true, // Use port 465 with secure: true for Render
                 auth: {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS
@@ -148,6 +148,7 @@ const sendEmailTool = new DynamicTool({
             await transporter.sendMail(mailOptions);
             return `Email sent successfully to ${email}.`;
         } catch (error) {
+            console.error("--- NODEMAILER ERROR ---", error);
             return `Failed to send email: ${error.message}`;
         }
     }
@@ -176,7 +177,7 @@ Always output your final answer as a raw JSON object with the following structur
     { "name": "Competitor 1", "description": "What they do", "url": "their URL if found" }
   ],
   "marketTrends": ["Trend 1", "Trend 2"],
-  "topKeywordsforSEO": [{"name":"keyword1","searchVolume":"searchVolume"},{"name":"keyword2","searchVolume":"searchVolume"}],
+  "topKeywordsforSEO": [{"name":"keyword1","searchVolume":"10k"},{"name":"keyword2","searchVolume":"1.5m"}], // Ensure searchVolume is formatted with k, m, or b (e.g., 10k, 1.5m, 2b)
   "targetAudience": {
     "primary": "Primary target audience",
     "secondary": "Secondary target audience" 
