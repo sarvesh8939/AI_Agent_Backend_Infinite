@@ -133,6 +133,7 @@ const sendEmailTool = new DynamicTool({
                 host: 'smtp.gmail.com',
                 port: 465,
                 secure: true, // Use port 465 with secure: true for Render
+                family: 4, // Force IPv4 explicitly for the socket
                 auth: {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS
