@@ -3,7 +3,7 @@ import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { DynamicTool } from "@langchain/core/tools";
 import axios from "axios";
 //import { TavilySearch } from "@langchain/tavily";
-//import fs from "fs";
+import fs from "fs";
 //import path from "path";
 //import os from "os";
 import ExcelJS from "exceljs";
@@ -112,7 +112,7 @@ const generateExcelTool = new DynamicTool({
 // 3. Define Send Email Tool
 const sendEmailTool = new DynamicTool({
     name: "send_email",
-    description: "Sends the generated Excel report to the user's email. Input MUST be a valid JSON string with 'email' (the user's email address) and 'attachmentPath' (the file path returned by generate_excel). Example: {\"email\": \"user@example.com\", \"attachmentPath\": \"C:/path/to/Research_Report_123.xlsx\"}",
+    description: "Sends the generated Excel report to the user's email. Input MUST be a valid JSON string with 'email' (the user's email address) and 'attachmentPath' (the file path returned by generate_excel). Example: {\"email\": \"user@example.com\", \"attachmentPath\": \"./Research_Report_123.xlsx\"}",
     func: async (inputStr) => {
         try {
             let cleanString = inputStr.trim();
@@ -129,11 +129,11 @@ const sendEmailTool = new DynamicTool({
                 return "Error: EMAIL_USER or EMAIL_PASS environment variables are not set on the server.";
             }
 
+            // Basic Nodemailer configuration
             let transporter = nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 465,
-                secure: true, // Use port 465 with secure: true for Render
-                family: 4, // Force IPv4 explicitly for the socket
+                host: process.env.SMTP_HOST || 'smtp.gmail.com', // Let user override host (e.g. SendGrid, Mailgun)
+                port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 465, // Let user override port (e.g. 2525 to bypass Render block)
+                secure: process.env.SMTP_SECURE === 'false' ? false : true, 
                 auth: {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS
